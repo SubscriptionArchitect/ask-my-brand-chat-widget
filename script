@@ -1,0 +1,54 @@
+(function() {
+  function initChatbot() {
+    const chatBody = document.getElementById('chatBody');
+    const box = document.getElementById('questionBox');
+    const greet = document.getElementById('aiGreet');
+
+    function addMessage(text, cls) {
+      const wrap = document.createElement('div');
+      wrap.className = 'message ' + cls;
+      wrap.textContent = text;
+      chatBody.appendChild(wrap);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function send() {
+      const q = box.value.trim();
+      if (!q) { box.focus(); return; }
+      addMessage(q, 'user');
+      setTimeout(() => {
+        window.location.href = 'https://www.achrnews.com/ask-ACHR-NEWS?ask=' + encodeURIComponent(q).replace(/%20/g, '+');
+      }, 300);
+    }
+
+    // Animate greeting
+    if (greet) {
+      const greetTxt = greet.textContent;
+      greet.textContent = '';
+      let i = 0;
+      (function typeLoop() {
+        if (i < greetTxt.length) {
+          greet.textContent += greetTxt[i++];
+          setTimeout(typeLoop, 35);
+        }
+      })();
+    }
+
+    document.getElementById('sendBtn')?.addEventListener('click', send);
+    box?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') send();
+    });
+  }
+
+  // Only run chatbot if user focuses or types in box
+  const box = document.getElementById('questionBox');
+  if (box) {
+    const triggerInit = () => {
+      initChatbot();
+      box.removeEventListener('focus', triggerInit);
+      box.removeEventListener('keydown', triggerInit);
+    };
+    box.addEventListener('focus', triggerInit, { once: true });
+    box.addEventListener('keydown', triggerInit, { once: true });
+  }
+})();
